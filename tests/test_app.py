@@ -7,16 +7,20 @@ client = TestClient(app)
 
 
 def test_unregister_participant_removes_email_from_activity():
+    # Arrange
     activity_name = "Chess Club"
     email = "michael@mergington.edu"
+    participants = activities[activity_name]["participants"]
 
-    before = activities[activity_name]["participants"]
-    assert email in before
+    assert email in participants
 
-    response = client.delete(f"/activities/{activity_name}/signup?email={email}")
+    try:
+        # Act
+        response = client.delete(f"/activities/{activity_name}/signup?email={email}")
 
-    assert response.status_code == 200
-    assert email not in activities[activity_name]["participants"]
-
-    # restore state for later tests
-    activities[activity_name]["participants"].append(email)
+        # Assert
+        assert response.status_code == 200
+        assert email not in activities[activity_name]["participants"]
+    finally:
+        if email not in activities[activity_name]["participants"]:
+            activities[activity_name]["participants"].append(email)
